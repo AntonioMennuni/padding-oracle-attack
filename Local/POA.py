@@ -23,7 +23,7 @@ def encrypt(plaintext):
     iv = get_random_bytes(BLOCK_SIZE) # Cryptographically secure random IV 
     cipher = DES.new(KEY, DES.MODE_CBC, iv) # DES in CBC mode 
     padded = pad(plaintext, BLOCK_SIZE) # PKCS#7 
-    #print(f"input con padding : {padded.hex()}") 
+    #print(f"input with padding value : {padded.hex()}") 
     ciphertext = cipher.encrypt(padded) # Encrypts the plaintext using DES in CBC mode  
  
     return iv, ciphertext 
