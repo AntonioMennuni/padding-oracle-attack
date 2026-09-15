@@ -39,4 +39,7 @@ values. By observing whether the resulting padding is valid, the attacker
 can recover the intermediate state and consequently the original
 plaintext.
 
----
+## Setup
+
+For a more in-depth analysis of the attack, the attack setup, and the code implementation, please refer to the POA_documentation.pdf file.
+
