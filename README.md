@@ -39,8 +39,6 @@ values. By observing whether the resulting padding is valid, the attacker
 can recover the intermediate state and consequently the original
 plaintext.
 
-## Project structure
-
 ## Project Structure
 
 ```text
@@ -55,6 +53,24 @@ plaintext.
 ```
 
 ## Setup
+
+## 2. Environment Setup
+
+To run these scripts locally, a Python environment must be configured with the libraries specified in the `requirements.txt` file.
+
+### 2.1 Prerequisites
+
+- Python 3 installed on the machine.
+- The Python package manager `pip`.
+
+### 2.2 Installation
+
+Run the following command:
+
+```bash
+pip install -r requirements.txt
+```
+and then execute the scripts.
 
 For a more in-depth analysis of the attack, the attack setup, and the code implementation, please refer to the POA_documentation.pdf file.
 
