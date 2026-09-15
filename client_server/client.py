@@ -4,18 +4,18 @@ from Cryptodome.Util.Padding import pad, unpad
 
 
 
-# Configurazione
+# Configuration
 
 BLOCK_SIZE = 8
 SERVER = "http://127.0.0.1:5000"
 #SERVER = "http://192.168.1.52:5000"
 
 
-# Padding oracle che verifica se il plaintext è correttamente formattato in termini di padding PKCS#7
+# Padding oracle that checks whether the plaintext is correctly formatted in terms of PKCS#7 padding
 
 def oracle(ciphertext: bytes) -> bool:
     
-    # se il plaintext è correttamente formattato in termini di padding il server restituisce lo status code 200
+    # If the plaintext is correctly formatted in terms of padding, the server returns HTTP status code 200
 
     token = base64.b64encode(ciphertext).decode()
 
@@ -28,16 +28,16 @@ def oracle(ciphertext: bytes) -> bool:
 
 
 
-# Suddivisione del ciphertext in blocchi da 8 byte
+# Split the ciphertext into 8-byte blocks
 
 def split_blocks(data: bytes, size: int = 8):
     
     blocks = []
     
-    # cicla attraverso i dati saltando di "size" byte alla volta
+    # Iterates through the data, moving forward by "size" bytes at a time
     for i in range(0, len(data), size):
 
-        # estrae il blocco corrente (dall'indice i fino a i + size)
+        # Extracts the current block (from index i to i + size)
         current_block = data[i : i + size]
         blocks.append(current_block)
         
@@ -54,39 +54,39 @@ def decrypt_block(prev_block, current_block):
 
     for pad_value in range(1, BLOCK_SIZE + 1):
         
-        # Inizializza 'crafted' ad ogni iterazione per ripartire puliti
+        # Initializes 'crafted' at each iteration to start with a clean copy
         crafted = bytearray(prev_block)
         index = BLOCK_SIZE - pad_value
 
-        # Aggiorna i byte gia trovati
+        # Updates the bytes already recovered
         for j in range(BLOCK_SIZE - 1, index, -1):
             crafted[j] = intermediate[j] ^ pad_value
 
-        # Prevenzione falsi positivi
-        # Alteriamo il penultimo byte solo quando stiamo cercando 
-        # Il primo byte di padding (pad_value == 1)
+        # Prevention of false positives
+        # We alter the penultimate byte only when looking for
+        # the first padding byte (pad_value == 1)
         if pad_value == 1 and index > 0:
             crafted[index - 1] ^= 0xFF
 
         found = False
 
-        for guess in range(256): #brute force sui possibili valori di un byte (da 0 a 255)
+        for guess in range(256): # brute-force the possible values of a byte (from 0 to 255)
             
             crafted[index] = guess
 
             forged = bytes(crafted) + current_block
 
-            if oracle(forged): # se il padding è correttamente formattato
+            if oracle(forged): # if the padding is correctly formatted
 
-                # Calcolo intermediate byte
+                # Calculate the intermediate byte
                 intermediate[index] = guess ^ pad_value
                 plaintext[index] = intermediate[index] ^ prev_block[index]
 
-                # Per evitare stampe strane nel terminale se il carattere non è stampabile
+                # Prevent strange terminal output if the character is not printable
                 char_repr = chr(plaintext[index]) if 32 <= plaintext[index] <= 126 else '.'
                 
                 print(
-                    f"Byte trovato [{index}] -> "
+                    f"Byte found [{index}] -> "
                     f"{plaintext[index]:02x} ({char_repr})"
                 )
 
@@ -94,7 +94,7 @@ def decrypt_block(prev_block, current_block):
                 break
 
         if not found:
-            raise Exception(f"Byte non trovato all'indice {index}")
+            raise Exception(f"Byte not found at index {index}")
 
     return bytes(plaintext)
 
@@ -116,25 +116,25 @@ def main():
 
     blocks = split_blocks(raw, BLOCK_SIZE)
 
-    print(f"Blocchi trovati: {len(blocks)-1} + l'iv")
+    print(f"Blocks found: {len(blocks)-1} + IV")
     
     for i, b in enumerate(blocks):
         print(i, b.hex())
 
     plaintext = b""
 
-    # cicla sui blocchi di cyphertext e li decifra usando l'attacco
+    # Iterate through the ciphertext blocks and decrypt them using the attack
     for i in range(1, len(blocks)):
-        print(f"\nDecrittazione blocco {i}")
+        print(f"\nDecrypting block {i}")
 
         p = decrypt_block(blocks[i - 1], blocks[i])
         plaintext += p
 
 
-    # Rimozione del padding
+    # Remove padding
 
     plaintext = unpad(plaintext, BLOCK_SIZE)
-    print("\n[+] Plaintext recuperato:")
+    print("\n[+] Recovered plaintext:")
     print(plaintext)
 
 
