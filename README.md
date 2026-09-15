@@ -72,5 +72,5 @@ pip install -r requirements.txt
 ```
 and then execute the scripts.
 
-For a more in-depth analysis of the attack, the attack setup, and the code implementation, please refer to the POA_documentation.pdf file.
+For a more in-depth analysis of the attack and the code implementation, please refer to the POA_documentation.pdf file.
 
